@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Bridge between the Onkyo AVR EISCP remote control protocol and MQTT.
 # Allows to remotely control networked Onkyo AVRs and get status
@@ -22,9 +24,9 @@ import eiscp
 version="0.7"
 
 parser = argparse.ArgumentParser(description='Bridge between onkyo-eiscp and MQTT')
-parser.add_argument('--mqtt-host', default='localhost', help='MQTT server address. Defaults to "localhost"')
+parser.add_argument('--mqtt-host', default='qualityland', help='MQTT server address. Defaults to "qualityland"')
 parser.add_argument('--mqtt-port', default='1883', type=int, help='MQTT server port. Defaults to 1883')
-parser.add_argument('--mqtt-topic', default='onkyo/', help='Topic prefix to be used for subscribing/publishing. Defaults to "onkyo/"')
+parser.add_argument('--mqtt-topic', default='qualityland/onkyo/', help='Topic prefix to be used for subscribing/publishing. Defaults to "onkyo/"')
 parser.add_argument('--onkyo-address', help='IP or hostname of the AVR. Defaults to autodiscover')
 parser.add_argument('--onkyo-id', help='Device identifier of AVR to connecct to. Uses autodiscover')
 parser.add_argument('--log', help='set log level to the specified value. Defaults to WARNING. Try DEBUG for maximum detail')
@@ -67,14 +69,14 @@ def msghandler(mqc,userdata,msg):
 	except Exception as e:
 		logging.warning("Error processing message %s" % e)
 
-def connecthandler(mqc,userdata,rc):
-    logging.info("Connected to MQTT broker with rc=%d" % (rc))
+def connecthandler(mqc,userdata,rc,properties=None):
+    logging.info("Connected to MQTT broker with rc=%s" % (rc))
     mqc.subscribe(topic+"set/#",qos=0)
     mqc.subscribe(topic+"command",qos=0)
     mqc.publish(topic+"connected",2,qos=1,retain=True)
 
 def disconnecthandler(mqc,userdata,rc):
-    logging.warning("Disconnected from MQTT broker with rc=%d" % (rc))
+    logging.warning("Disconnected from MQTT broker with rc=%s" % (rc))
     time.sleep(5)
 
 mqc=mqtt.Client()
